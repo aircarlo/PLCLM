@@ -12,7 +12,7 @@ PLCLM frames PLC as a **causal next-token prediction** problem on discrete codew
 Key design choices:
 
 - **Codec-domain operation** - PLC is performed before decoding, avoiding the overhead of decoding and re-encoding that waveform-based approaches entail.
-- **Codebook selection** - A redundancy analysis shows that 4 of the 9 DAC codebooks suffice for perceptually adequate speech reconstruction, reducing computational cost.
+- **Codebook selection** - A redundancy analysis shows that only a subset of codebooks suffice for perceptually adequate speech reconstruction, reducing computational cost.
 - **Weighted loss** - A hierarchical cross-entropy loss prioritizes lower-index codebooks, which encode the most perceptually salient features.
 - **PLCLM+ATT variant** - An optional causal cross-codebook attention mechanism exploits inter-codebook dependencies while respecting the RVQ hierarchy.
 
