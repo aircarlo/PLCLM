@@ -7,7 +7,7 @@ Università Politecnica delle Marche, Italy · Carnegie Mellon University, USA
 
 ## Method Overview
 
-PLCLM frames PLC as a **causal next-token prediction** problem on discrete codeword sequences produced by a neural encoder. A decoder-only **RoFormer** Transformer is trained to predict missing codewords from past context only, ensuring strict causality and an algorithmic latency of **11.6 ms**.
+PLCLM frames PLC as a **causal next-token prediction** problem on discrete codeword sequences produced by a neural encoder. A decoder-only **RoFormer** Transformer is trained to predict missing codewords from past context only, ensuring strict causality and low algorithmic latency.
 
 Key design choices:
 
