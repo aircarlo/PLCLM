@@ -16,7 +16,7 @@ Key design choices:
 - **Weighted loss** - A hierarchical cross-entropy loss prioritizes lower-index codebooks, which encode the most perceptually salient features.
 - **PLCLM+ATT variant** - An optional causal cross-codebook attention mechanism exploits inter-codebook dependencies while respecting the RVQ hierarchy.
 
-Audio examples comparing clean, corrupted and PLCLM-restored speech across packet loss rates from 10% to 60% are available on the [Demo page 🔊](https://aircarlo.github.io/PLCLM/):
+Audio examples comparing clean, corrupted and PLCLM-restored speech, produced by the [Descript Audio Codec (DAC)](https://github.com/descriptinc/descript-audio-codec) and [EnCodec](https://github.com/facebookresearch/encodec), across packet loss rates from 10% to 60% and under real network loss traces, are available on the [Demo page 🔊](https://aircarlo.github.io/PLCLM/):
 
 ## Contact
 

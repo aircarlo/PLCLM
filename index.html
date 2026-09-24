@@ -143,6 +143,27 @@
       padding: 0 40px 80px;
     }
 
+    .content-section {
+      margin-bottom: 56px;
+    }
+
+    .section-number {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    .section-heading {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 14px;
+      letter-spacing: -0.01em;
+    }
+
     .section-label {
       font-family: var(--mono);
       font-size: 0.72rem;
@@ -153,13 +174,20 @@
     }
 
     .section-title {
-      font-size: 1.0rem;
+      font-size: 0.93rem;
       font-weight: 400;
-      color: var(--text);
+      color: var(--text-muted);
       margin-bottom: 32px;
-      padding-bottom: 16px;
+      padding-bottom: 24px;
       border-bottom: 1px solid var(--border);
       letter-spacing: -0.01em;
+      line-height: 1.75;
+    }
+
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 0 0 56px;
     }
 
     /* ── AUDIO TABLE ── */
@@ -167,7 +195,6 @@
       display: flex;
       flex-direction: column;
       gap: 2px;
-      margin-bottom: 64px;
     }
 
     /* column headers */
@@ -237,35 +264,6 @@
       gap: 6px;
     }
 
-    .transcript {
-      grid-column: 1 / -1;
-      font-size: 0.82rem;
-      color: var(--text-dim);
-      font-style: italic;
-      padding-top: 10px;
-      border-top: 1px solid var(--border);
-      margin-top: 4px;
-      padding-left: 2px;
-    }
-
-    .transcript::before {
-      content: '"';
-      color: var(--text-dim);
-      font-family: var(--mono);
-      font-size: 0.7rem;
-      margin-right: 4px;
-      font-style: normal;
-    }
-
-    .transcript::after {
-      content: '"';
-      color: var(--text-dim);
-      font-family: var(--mono);
-      font-size: 0.7rem;
-      margin-left: 4px;
-      font-style: normal;
-    }
-
     /* custom audio player */
     audio {
       width: 100%;
@@ -300,9 +298,11 @@
       outline: none;
     }
 
-    /* ── BURST SECTION ── */
+    /* ── BURST SECTION (real network traces) ── */
     .burst-section {
-      margin-bottom: 64px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
     }
 
     .burst-card {
@@ -310,7 +310,6 @@
       border: 1px solid var(--border);
       border-radius: var(--radius);
       padding: 24px;
-      margin-bottom: 12px;
     }
 
     .burst-card .burst-meta {
@@ -336,13 +335,13 @@
       font-size: 0.88rem;
       font-weight: 500;
       color: var(--text);
+      font-family: var(--mono);
     }
 
     .burst-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 12px;
-      margin-bottom: 14px;
     }
 
     .burst-col-label {
@@ -356,17 +355,6 @@
     .burst-col-label.clean { color: var(--accent3); }
     .burst-col-label.lossy { color: var(--accent2); }
     .burst-col-label.restored { color: var(--accent); }
-
-    .burst-transcript {
-      font-size: 0.82rem;
-      color: var(--text-dim);
-      font-style: italic;
-      padding-top: 12px;
-      border-top: 1px solid var(--border);
-    }
-
-    .burst-transcript::before { content: '"'; }
-    .burst-transcript::after  { content: '"'; }
 
     /* ── FOOTER ── */
     footer {
@@ -471,10 +459,11 @@
     of neural codec representations, we formulate PLC as a causal sequence modeling problem and propose an
     autoregressive Transformer trained to perform next-token prediction on codec codeword streams. The model
     operates strictly causally and is compatible with low-latency, real-time constraints. Using the Descript Audio
-    Codec (DAC) as a representative neural codec, we analyze the perceptual relevance of parallel codebooks and
-    show that accurate reconstruction can be achieved by predicting only a subset of codewords. Experimental results
-    demonstrate that codeword-level PLC yields perceptually plausible and semantically consistent reconstructions
-    under a wide range of packet loss rates, while providing a principled and deployment-oriented alternative to
+    Codec (DAC) and EnCodec as representative neural codecs, we analyze the perceptual relevance of parallel
+    codebooks and show that accurate reconstruction can be achieved by predicting only a subset of codewords.
+    Experimental results, carried out on both codecs, under a wide range of i.i.d. packet loss rates and under real
+    loss traces from operational calls, demonstrate that codeword-level PLC yields perceptually plausible and
+    semantically consistent reconstructions, while providing a principled and deployment-oriented alternative to
     waveform-domain concealment methods.
   </p>
 </div>
@@ -482,200 +471,505 @@
 <!-- ═══════════════ MAIN ═══════════════ -->
 <main>
 
-  <!-- ── i.i.d. examples ── -->
-  <div class="section-title">Below is a curated set of audio samples affected by simulated packet loss ranging from 10% to 60%. The degradation is applied in the compressed domain, where missing packets are replaced with a silent prototype packet, effectively simulating zero-filling as a naive reconstruction strategy. All samples are drawn from the test set. Headphone use is recommended for optimal listening.</div>
+  <!-- ── SECTION 1 : DAC i.i.d. examples ── -->
+  <section class="content-section" id="dac-section">
+    <div class="section-number">Section 1 / 3</div>
+    <div class="section-heading">Descript Audio Codec (DAC)</div>
+    <div class="section-title">The samples below were produced using the Descript Audio Codec (DAC). Simulated i.i.d. packet loss is applied directly in the compressed domain, with loss rates ranging from 10% to 60%; missing packets are replaced with a silent prototype packet, emulating zero-filling as a naive reconstruction baseline. All samples are drawn from the test set. Headphone use is recommended for optimal listening.</div>
 
-  <!-- column headers -->
-  <div class="grid-header">
-    <span></span>
-    <span class="col-clean">Clean</span>
-    <span class="col-lossy">Corrupted</span>
-    <span class="col-restored">PLCLM restored</span>
-  </div>
-
-  <div class="audio-grid">
-
-    <!-- PLR 10% -->
-    <div class="audio-row">
-      <div class="plr-badge">
-        <span class="plr-num">10%</span>
-        <span class="plr-label">PLR</span>
-      </div>
-      <div class="audio-cell">
-        <div class="audio-wrap clean">
-          <audio class="clean-audio" controls>
-            <source src="audio/plr10/p234_149_mic_clean.wav" type="audio/wav">
-          </audio>
-        </div>
-      </div>
-      <div class="audio-cell">
-        <div class="audio-wrap lossy">
-          <audio class="lossy-audio" controls>
-            <source src="audio/plr10/p234_149_mic_lossy.wav" type="audio/wav">
-          </audio>
-        </div>
-      </div>
-      <div class="audio-cell">
-        <div class="audio-wrap restored">
-          <audio class="restored-audio" controls>
-            <source src="audio/plr10/p234_149_mic_restored.wav" type="audio/wav">
-          </audio>
-        </div>
-      </div>
-      <div class="transcript">Full consent is expected by the end of next year</div>
+    <!-- column headers -->
+    <div class="grid-header">
+      <span></span>
+      <span class="col-clean">Clean</span>
+      <span class="col-lossy">Corrupted</span>
+      <span class="col-restored">PLCLM restored</span>
     </div>
 
-    <!-- PLR 20% -->
-    <div class="audio-row">
-      <div class="plr-badge">
-        <span class="plr-num">20%</span>
-        <span class="plr-label">PLR</span>
-      </div>
-      <div class="audio-cell">
-        <div class="audio-wrap clean">
-          <audio class="clean-audio" controls>
-            <source src="audio/plr20/p255_244_mic_clean.wav" type="audio/wav">
-          </audio>
+    <div class="audio-grid">
+
+      <!-- PLR 10% -->
+      <div class="audio-row">
+        <div class="plr-badge">
+          <span class="plr-num">10%</span>
+          <span class="plr-label">PLR</span>
+        </div>
+        <div class="audio-cell">
+          <div class="audio-wrap clean">
+            <audio class="clean-audio" controls>
+              <source src="audio/dac_iid/plr10/p234_149_mic_clean.wav" type="audio/wav">
+            </audio>
+          </div>
+        </div>
+        <div class="audio-cell">
+          <div class="audio-wrap lossy">
+            <audio class="lossy-audio" controls>
+              <source src="audio/dac_iid/plr10/p234_149_mic_lossy.wav" type="audio/wav">
+            </audio>
+          </div>
+        </div>
+        <div class="audio-cell">
+          <div class="audio-wrap restored">
+            <audio class="restored-audio" controls>
+              <source src="audio/dac_iid/plr10/p234_149_mic_restored.wav" type="audio/wav">
+            </audio>
+          </div>
         </div>
       </div>
-      <div class="audio-cell">
-        <div class="audio-wrap lossy">
-          <audio class="lossy-audio" controls>
-            <source src="audio/plr20/p255_244_mic_lossy.wav" type="audio/wav">
-          </audio>
+
+      <!-- PLR 20% -->
+      <div class="audio-row">
+        <div class="plr-badge">
+          <span class="plr-num">20%</span>
+          <span class="plr-label">PLR</span>
+        </div>
+        <div class="audio-cell">
+          <div class="audio-wrap clean">
+            <audio class="clean-audio" controls>
+              <source src="audio/dac_iid/plr20/p255_244_mic_clean.wav" type="audio/wav">
+            </audio>
+          </div>
+        </div>
+        <div class="audio-cell">
+          <div class="audio-wrap lossy">
+            <audio class="lossy-audio" controls>
+              <source src="audio/dac_iid/plr20/p255_244_mic_lossy.wav" type="audio/wav">
+            </audio>
+          </div>
+        </div>
+        <div class="audio-cell">
+          <div class="audio-wrap restored">
+            <audio class="restored-audio" controls>
+              <source src="audio/dac_iid/plr20/p255_244_mic_restored.wav" type="audio/wav">
+            </audio>
+          </div>
         </div>
       </div>
-      <div class="audio-cell">
-        <div class="audio-wrap restored">
-          <audio class="restored-audio" controls>
-            <source src="audio/plr20/p255_244_mic_restored.wav" type="audio/wav">
-          </audio>
+
+      <!-- PLR 30% -->
+      <div class="audio-row">
+        <div class="plr-badge">
+          <span class="plr-num">30%</span>
+          <span class="plr-label">PLR</span>
+        </div>
+        <div class="audio-cell">
+          <div class="audio-wrap clean">
+            <audio class="clean-audio" controls>
+              <source src="audio/dac_iid/plr30/p299_142_mic_clean.wav" type="audio/wav">
+            </audio>
+          </div>
+        </div>
+        <div class="audio-cell">
+          <div class="audio-wrap lossy">
+            <audio class="lossy-audio" controls>
+              <source src="audio/dac_iid/plr30/p299_142_mic_lossy.wav" type="audio/wav">
+            </audio>
+          </div>
+        </div>
+        <div class="audio-cell">
+          <div class="audio-wrap restored">
+            <audio class="restored-audio" controls>
+              <source src="audio/dac_iid/plr30/p299_142_mic_restored.wav" type="audio/wav">
+            </audio>
+          </div>
         </div>
       </div>
-      <div class="transcript">They had no children</div>
+
+      <!-- PLR 40% -->
+      <div class="audio-row">
+        <div class="plr-badge">
+          <span class="plr-num">40%</span>
+          <span class="plr-label">PLR</span>
+        </div>
+        <div class="audio-cell">
+          <div class="audio-wrap clean">
+            <audio class="clean-audio" controls>
+              <source src="audio/dac_iid/plr40/p304_306_mic_clean.wav" type="audio/wav">
+            </audio>
+          </div>
+        </div>
+        <div class="audio-cell">
+          <div class="audio-wrap lossy">
+            <audio class="lossy-audio" controls>
+              <source src="audio/dac_iid/plr40/p304_306_mic_lossy.wav" type="audio/wav">
+            </audio>
+          </div>
+        </div>
+        <div class="audio-cell">
+          <div class="audio-wrap restored">
+            <audio class="restored-audio" controls>
+              <source src="audio/dac_iid/plr40/p304_306_mic_restored.wav" type="audio/wav">
+            </audio>
+          </div>
+        </div>
+      </div>
+
+      <!-- PLR 50% -->
+      <div class="audio-row">
+        <div class="plr-badge">
+          <span class="plr-num">50%</span>
+          <span class="plr-label">PLR</span>
+        </div>
+        <div class="audio-cell">
+          <div class="audio-wrap clean">
+            <audio class="clean-audio" controls>
+              <source src="audio/dac_iid/plr50/p247_459_mic_clean.wav" type="audio/wav">
+            </audio>
+          </div>
+        </div>
+        <div class="audio-cell">
+          <div class="audio-wrap lossy">
+            <audio class="lossy-audio" controls>
+              <source src="audio/dac_iid/plr50/p247_459_mic_lossy.wav" type="audio/wav">
+            </audio>
+          </div>
+        </div>
+        <div class="audio-cell">
+          <div class="audio-wrap restored">
+            <audio class="restored-audio" controls>
+              <source src="audio/dac_iid/plr50/p247_459_mic_restored.wav" type="audio/wav">
+            </audio>
+          </div>
+        </div>
+      </div>
+
+      <!-- PLR 60% -->
+      <div class="audio-row">
+        <div class="plr-badge">
+          <span class="plr-num">60%</span>
+          <span class="plr-label">PLR</span>
+        </div>
+        <div class="audio-cell">
+          <div class="audio-wrap clean">
+            <audio class="clean-audio" controls>
+              <source src="audio/dac_iid/plr60/p361_275_mic_clean.wav" type="audio/wav">
+            </audio>
+          </div>
+        </div>
+        <div class="audio-cell">
+          <div class="audio-wrap lossy">
+            <audio class="lossy-audio" controls>
+              <source src="audio/dac_iid/plr60/p361_275_mic_lossy.wav" type="audio/wav">
+            </audio>
+          </div>
+        </div>
+        <div class="audio-cell">
+          <div class="audio-wrap restored">
+            <audio class="restored-audio" controls>
+              <source src="audio/dac_iid/plr60/p361_275_mic_restored.wav" type="audio/wav">
+            </audio>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /audio-grid -->
+  </section>
+
+  <hr class="section-divider">
+
+  <!-- ── SECTION 2 : EnCodec i.i.d. examples ── -->
+  <section class="content-section" id="encodec-section">
+    <div class="section-number">Section 2 / 3</div>
+    <div class="section-heading">EnCodec</div>
+    <div class="section-title">The samples below were produced using EnCodec, under the same simulated i.i.d. packet loss conditions described above (loss rates from 10% to 60%, applied in the compressed domain with a silent prototype packet as a naive reconstruction baseline). All samples are drawn from the test set. Headphone use is recommended for optimal listening.</div>
+
+    <!-- column headers -->
+    <div class="grid-header">
+      <span></span>
+      <span class="col-clean">Clean</span>
+      <span class="col-lossy">Corrupted</span>
+      <span class="col-restored">PLCLM restored</span>
     </div>
 
-    <!-- PLR 30% -->
-    <div class="audio-row">
-      <div class="plr-badge">
-        <span class="plr-num">30%</span>
-        <span class="plr-label">PLR</span>
-      </div>
-      <div class="audio-cell">
-        <div class="audio-wrap clean">
-          <audio class="clean-audio" controls>
-            <source src="audio/plr30/p299_142_mic_clean.wav" type="audio/wav">
-          </audio>
-        </div>
-      </div>
-      <div class="audio-cell">
-        <div class="audio-wrap lossy">
-          <audio class="lossy-audio" controls>
-            <source src="audio/plr30/p299_142_mic_lossy.wav" type="audio/wav">
-          </audio>
-        </div>
-      </div>
-      <div class="audio-cell">
-        <div class="audio-wrap restored">
-          <audio class="restored-audio" controls>
-            <source src="audio/plr30/p299_142_mic_restored.wav" type="audio/wav">
-          </audio>
-        </div>
-      </div>
-      <div class="transcript">Such a city does not exist</div>
-    </div>
+    <div class="audio-grid">
 
-    <!-- PLR 40% -->
-    <div class="audio-row">
-      <div class="plr-badge">
-        <span class="plr-num">40%</span>
-        <span class="plr-label">PLR</span>
-      </div>
-      <div class="audio-cell">
-        <div class="audio-wrap clean">
-          <audio class="clean-audio" controls>
-            <source src="audio/plr40/p304_306_mic_clean.wav" type="audio/wav">
-          </audio>
+      <!-- PLR 10% -->
+      <div class="audio-row">
+        <div class="plr-badge">
+          <span class="plr-num">10%</span>
+          <span class="plr-label">PLR</span>
+        </div>
+        <div class="audio-cell">
+          <div class="audio-wrap clean">
+            <audio class="clean-audio" controls>
+              <source src="audio/encodec_iid/plr10/p232_062_mic_clean.wav" type="audio/wav">
+            </audio>
+          </div>
+        </div>
+        <div class="audio-cell">
+          <div class="audio-wrap lossy">
+            <audio class="lossy-audio" controls>
+              <source src="audio/encodec_iid/plr10/p232_062_mic_lossy.wav" type="audio/wav">
+            </audio>
+          </div>
+        </div>
+        <div class="audio-cell">
+          <div class="audio-wrap restored">
+            <audio class="restored-audio" controls>
+              <source src="audio/encodec_iid/plr10/p232_062_mic_restored.wav" type="audio/wav">
+            </audio>
+          </div>
         </div>
       </div>
-      <div class="audio-cell">
-        <div class="audio-wrap lossy">
-          <audio class="lossy-audio" controls>
-            <source src="audio/plr40/p304_306_mic_lossy.wav" type="audio/wav">
-          </audio>
-        </div>
-      </div>
-      <div class="audio-cell">
-        <div class="audio-wrap restored">
-          <audio class="restored-audio" controls>
-            <source src="audio/plr40/p304_306_mic_restored.wav" type="audio/wav">
-          </audio>
-        </div>
-      </div>
-      <div class="transcript">He is married, with two children</div>
-    </div>
 
-    <!-- PLR 50% -->
-    <div class="audio-row">
-      <div class="plr-badge">
-        <span class="plr-num">50%</span>
-        <span class="plr-label">PLR</span>
-      </div>
-      <div class="audio-cell">
-        <div class="audio-wrap clean">
-          <audio class="clean-audio" controls>
-            <source src="audio/plr50/p247_459_mic_clean.wav" type="audio/wav">
-          </audio>
+      <!-- PLR 20% -->
+      <div class="audio-row">
+        <div class="plr-badge">
+          <span class="plr-num">20%</span>
+          <span class="plr-label">PLR</span>
+        </div>
+        <div class="audio-cell">
+          <div class="audio-wrap clean">
+            <audio class="clean-audio" controls>
+              <source src="audio/encodec_iid/plr20/p237_037_mic_clean.wav" type="audio/wav">
+            </audio>
+          </div>
+        </div>
+        <div class="audio-cell">
+          <div class="audio-wrap lossy">
+            <audio class="lossy-audio" controls>
+              <source src="audio/encodec_iid/plr20/p237_037_mic_lossy.wav" type="audio/wav">
+            </audio>
+          </div>
+        </div>
+        <div class="audio-cell">
+          <div class="audio-wrap restored">
+            <audio class="restored-audio" controls>
+              <source src="audio/encodec_iid/plr20/p237_037_mic_restored.wav" type="audio/wav">
+            </audio>
+          </div>
         </div>
       </div>
-      <div class="audio-cell">
-        <div class="audio-wrap lossy">
-          <audio class="lossy-audio" controls>
-            <source src="audio/plr50/p247_459_mic_lossy.wav" type="audio/wav">
-          </audio>
-        </div>
-      </div>
-      <div class="audio-cell">
-        <div class="audio-wrap restored">
-          <audio class="restored-audio" controls>
-            <source src="audio/plr50/p247_459_mic_restored.wav" type="audio/wav">
-          </audio>
-        </div>
-      </div>
-      <div class="transcript">The damage is all inside</div>
-    </div>
 
-    <!-- PLR 60% -->
-    <div class="audio-row">
-      <div class="plr-badge">
-        <span class="plr-num">60%</span>
-        <span class="plr-label">PLR</span>
-      </div>
-      <div class="audio-cell">
-        <div class="audio-wrap clean">
-          <audio class="clean-audio" controls>
-            <source src="audio/plr60/p361_275_mic_clean.wav" type="audio/wav">
-          </audio>
+      <!-- PLR 30% -->
+      <div class="audio-row">
+        <div class="plr-badge">
+          <span class="plr-num">30%</span>
+          <span class="plr-label">PLR</span>
+        </div>
+        <div class="audio-cell">
+          <div class="audio-wrap clean">
+            <audio class="clean-audio" controls>
+              <source src="audio/encodec_iid/plr30/p245_242_mic_clean.wav" type="audio/wav">
+            </audio>
+          </div>
+        </div>
+        <div class="audio-cell">
+          <div class="audio-wrap lossy">
+            <audio class="lossy-audio" controls>
+              <source src="audio/encodec_iid/plr30/p245_242_mic_lossy.wav" type="audio/wav">
+            </audio>
+          </div>
+        </div>
+        <div class="audio-cell">
+          <div class="audio-wrap restored">
+            <audio class="restored-audio" controls>
+              <source src="audio/encodec_iid/plr30/p245_242_mic_restored.wav" type="audio/wav">
+            </audio>
+          </div>
         </div>
       </div>
-      <div class="audio-cell">
-        <div class="audio-wrap lossy">
-          <audio class="lossy-audio" controls>
-            <source src="audio/plr60/p361_275_mic_lossy.wav" type="audio/wav">
-          </audio>
-        </div>
-      </div>
-      <div class="audio-cell">
-        <div class="audio-wrap restored">
-          <audio class="restored-audio" controls>
-            <source src="audio/plr60/p361_275_mic_restored.wav" type="audio/wav">
-          </audio>
-        </div>
-      </div>
-      <div class="transcript">It is still under discussion with the board</div>
-    </div>
 
-  </div><!-- /audio-grid -->
+      <!-- PLR 40% -->
+      <div class="audio-row">
+        <div class="plr-badge">
+          <span class="plr-num">40%</span>
+          <span class="plr-label">PLR</span>
+        </div>
+        <div class="audio-cell">
+          <div class="audio-wrap clean">
+            <audio class="clean-audio" controls>
+              <source src="audio/encodec_iid/plr40/p276_005_mic_clean.wav" type="audio/wav">
+            </audio>
+          </div>
+        </div>
+        <div class="audio-cell">
+          <div class="audio-wrap lossy">
+            <audio class="lossy-audio" controls>
+              <source src="audio/encodec_iid/plr40/p276_005_mic_lossy.wav" type="audio/wav">
+            </audio>
+          </div>
+        </div>
+        <div class="audio-cell">
+          <div class="audio-wrap restored">
+            <audio class="restored-audio" controls>
+              <source src="audio/encodec_iid/plr40/p276_005_mic_restored.wav" type="audio/wav">
+            </audio>
+          </div>
+        </div>
+      </div>
+
+      <!-- PLR 50% -->
+      <div class="audio-row">
+        <div class="plr-badge">
+          <span class="plr-num">50%</span>
+          <span class="plr-label">PLR</span>
+        </div>
+        <div class="audio-cell">
+          <div class="audio-wrap clean">
+            <audio class="clean-audio" controls>
+              <source src="audio/encodec_iid/plr50/p265_337_mic_clean.wav" type="audio/wav">
+            </audio>
+          </div>
+        </div>
+        <div class="audio-cell">
+          <div class="audio-wrap lossy">
+            <audio class="lossy-audio" controls>
+              <source src="audio/encodec_iid/plr50/p265_337_mic_lossy.wav" type="audio/wav">
+            </audio>
+          </div>
+        </div>
+        <div class="audio-cell">
+          <div class="audio-wrap restored">
+            <audio class="restored-audio" controls>
+              <source src="audio/encodec_iid/plr50/p265_337_mic_restored.wav" type="audio/wav">
+            </audio>
+          </div>
+        </div>
+      </div>
+
+      <!-- PLR 60% -->
+      <div class="audio-row">
+        <div class="plr-badge">
+          <span class="plr-num">60%</span>
+          <span class="plr-label">PLR</span>
+        </div>
+        <div class="audio-cell">
+          <div class="audio-wrap clean">
+            <audio class="clean-audio" controls>
+              <source src="audio/encodec_iid/plr60/p287_213_mic_clean.wav" type="audio/wav">
+            </audio>
+          </div>
+        </div>
+        <div class="audio-cell">
+          <div class="audio-wrap lossy">
+            <audio class="lossy-audio" controls>
+              <source src="audio/encodec_iid/plr60/p287_213_mic_lossy.wav" type="audio/wav">
+            </audio>
+          </div>
+        </div>
+        <div class="audio-cell">
+          <div class="audio-wrap restored">
+            <audio class="restored-audio" controls>
+              <source src="audio/encodec_iid/plr60/p287_213_mic_restored.wav" type="audio/wav">
+            </audio>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /audio-grid -->
+  </section>
+
+  <hr class="section-divider">
+
+  <!-- ── SECTION 3 : real network trace examples ── -->
+  <section class="content-section" id="real-traces-section">
+    <div class="section-number">Section 3 / 3</div>
+    <div class="section-heading">Real network conditions (MS Teams calls)</div>
+    <div class="section-title">The examples below illustrate PLCLM's performance under real network conditions. Packet loss traces were extracted from real Microsoft Teams calls (dataset courtesy of Microsoft) and reflect authentic burst-loss patterns observed in operational VoIP traffic, rather than synthetic i.i.d. loss. Headphone use is recommended for optimal listening.</div>
+
+    <div class="burst-section">
+
+      <div class="burst-card">
+        <div class="burst-meta">
+          <span class="burst-tag">Real trace</span>
+          <span class="burst-title">p256_165</span>
+        </div>
+        <div class="burst-grid">
+          <div>
+            <div class="burst-col-label clean">Clean</div>
+            <div class="audio-wrap clean">
+              <audio class="clean-audio" controls>
+                <source src="audio/real_traces/p256_165_mic_clean.wav" type="audio/wav">
+              </audio>
+            </div>
+          </div>
+          <div>
+            <div class="burst-col-label lossy">Corrupted</div>
+            <div class="audio-wrap lossy">
+              <audio class="lossy-audio" controls>
+                <source src="audio/real_traces/p256_165_mic_lossy.wav" type="audio/wav">
+              </audio>
+            </div>
+          </div>
+          <div>
+            <div class="burst-col-label restored">PLCLM restored</div>
+            <div class="audio-wrap restored">
+              <audio class="restored-audio" controls>
+                <source src="audio/real_traces/p256_165_mic_restored.wav" type="audio/wav">
+              </audio>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="burst-card">
+        <div class="burst-meta">
+          <span class="burst-tag">Real trace</span>
+          <span class="burst-title">p285_009</span>
+        </div>
+        <div class="burst-grid">
+          <div>
+            <div class="burst-col-label clean">Clean</div>
+            <div class="audio-wrap clean">
+              <audio class="clean-audio" controls>
+                <source src="audio/real_traces/p285_009_mic_clean.wav" type="audio/wav">
+              </audio>
+            </div>
+          </div>
+          <div>
+            <div class="burst-col-label lossy">Corrupted</div>
+            <div class="audio-wrap lossy">
+              <audio class="lossy-audio" controls>
+                <source src="audio/real_traces/p285_009_mic_lossy.wav" type="audio/wav">
+              </audio>
+            </div>
+          </div>
+          <div>
+            <div class="burst-col-label restored">PLCLM restored</div>
+            <div class="audio-wrap restored">
+              <audio class="restored-audio" controls>
+                <source src="audio/real_traces/p285_009_mic_restored.wav" type="audio/wav">
+              </audio>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="burst-card">
+        <div class="burst-meta">
+          <span class="burst-tag">Real trace</span>
+          <span class="burst-title">p347_238</span>
+        </div>
+        <div class="burst-grid">
+          <div>
+            <div class="burst-col-label clean">Clean</div>
+            <div class="audio-wrap clean">
+              <audio class="clean-audio" controls>
+                <source src="audio/real_traces/p347_238_mic_clean.wav" type="audio/wav">
+              </audio>
+            </div>
+          </div>
+          <div>
+            <div class="burst-col-label lossy">Corrupted</div>
+            <div class="audio-wrap lossy">
+              <audio class="lossy-audio" controls>
+                <source src="audio/real_traces/p347_238_mic_lossy.wav" type="audio/wav">
+              </audio>
+            </div>
+          </div>
+          <div>
+            <div class="burst-col-label restored">PLCLM restored</div>
+            <div class="audio-wrap restored">
+              <audio class="restored-audio" controls>
+                <source src="audio/real_traces/p347_238_mic_restored.wav" type="audio/wav">
+              </audio>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /burst-section -->
+  </section>
 
 </main>
 
